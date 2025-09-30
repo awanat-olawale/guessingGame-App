@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Guessing Game</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1> Guessing Game</h1>
+
+    <!-- Join existing session -->
+    <form onsubmit="this.action='/lobby/'+document.getElementById('sessionId').value">
+      <input id="sessionId" name="sessionId" placeholder="Enter Session ID" required />
+      <button type="submit">Join Lobby</button>
+    </form>
+
+    <!-- Create new session -->
+    <form action="" method="GET" onsubmit="this.action='/lobby/'+Date.now()">
+      <button type="submit">Create New Game</button>
+    </form>
+  </div>
+</body>
+</html>

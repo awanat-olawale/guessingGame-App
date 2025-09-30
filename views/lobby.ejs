@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Lobby</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="container">
+    <h2>Lobby: <%= sessionId %></h2>
+    <input id="playerName" placeholder="Enter your name" />
+    <button onclick="joinGame()">Join</button>
+
+    <ul id="players"></ul>
+
+    <button id="startBtn" style="display:none;" onclick="startGame()">Start Game</button>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const sessionId = "<%= sessionId %>";
+    let playerId = Date.now().toString();
+
+    function joinGame() {
+      const name = document.getElementById("playerName").value;
+      socket.emit("joinGame", { sessionId, playerId });
+      fetch("/api/games/join", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId, playerId, name })
+      }).then(res => res.json()).then(data => {
+        console.log("Joined:", data);
+      });
+    }
+
+    socket.on("playerJoined", ({ players }) => {
+      document.getElementById("players").innerHTML =
+        players.map(p => `<li>${p.name}</li>`).join("");
+      if (players.length >= 3) {
+        document.getElementById("startBtn").style.display = "block";
+      }
+    });
+
+    function startGame() {
+      window.location.href = `/game/${sessionId}`;
+    }
+  </script>
+</body>
+</html>

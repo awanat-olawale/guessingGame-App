@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Game Session</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="container">
+    <h2>Game Session: <%= sessionId %></h2>
+
+    <div id="chat"></div>
+
+    <input id="guessInput" placeholder="Enter guess..." />
+    <button onclick="sendGuess()">Guess</button>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const sessionId = "<%= sessionId %>";
+    let playerId = Date.now().toString();
+
+    function sendGuess() {
+      const guess = document.getElementById("guessInput").value;
+      socket.emit("guess", { sessionId, playerId, guess });
+    }
+
+    socket.on("questionSet", ({ question }) => {
+      document.getElementById("chat").innerHTML += `<p><b>Question:</b> ${question}</p>`;
+    });
+
+    socket.on("wrongGuess", ({ attemptsLeft }) => {
+      document.getElementById("chat").innerHTML += `<p>You guessed wrong. Attempts left: ${attemptsLeft}</p>`;
+    });
+
+    socket.on("gameOver", ({ winner, answer, scores }) => {
+      document.getElementById("chat").innerHTML += `<p>Hurray!!!${winner} won! Answer was: ${answer}</p>`;
+    });
+
+    socket.on("timeUp", ({ answer }) => {
+      document.getElementById("chat").innerHTML += `<p> Time up! Answer was: ${answer}</p>`;
+    });
+  </script>
+</body>
+</html>
